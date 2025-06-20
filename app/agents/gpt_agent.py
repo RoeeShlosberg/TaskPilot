@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import List
 from dotenv import load_dotenv
 from ..models.task_model import Task
+from ..cache.redis_cache import cache
 
 load_dotenv()
 
@@ -170,6 +171,107 @@ async def query_gpt(prompt: str) -> str:
             return get_mock_response(prompt)
     except Exception as e:
         return f"Sorry, I encountered an error while processing your request: {str(e)}. Please check your AI service configuration and try again."
+
+async def get_project_summary(tasks: List[Task]) -> str:
+    """Get project summary with caching."""
+    # Create cache-friendly task data (exclude timestamps that change)
+    task_data = {
+        "endpoint": "summary",
+        "task_count": len(tasks),
+        "completed_count": len([t for t in tasks if t.completed]),
+        "task_ids": [t.id for t in tasks],
+        "task_statuses": [t.completed for t in tasks]
+    }
+    
+    # Try to get from cache first
+    cached_response = cache.get("summary", task_data)
+    if cached_response:
+        return cached_response
+    
+    # Generate new response
+    prompt = build_prompt_summary(tasks)
+    response = await query_gpt(prompt)
+    
+    # Cache the response
+    cache.set("summary", task_data, response)
+    
+    return response
+
+async def get_task_recommendations(tasks: List[Task]) -> str:
+    """Get task recommendations with caching."""
+    # Create cache-friendly task data
+    pending_tasks = [t for t in tasks if not t.completed]
+    task_data = {
+        "endpoint": "recommendations",
+        "pending_count": len(pending_tasks),
+        "pending_ids": [t.id for t in pending_tasks],
+        "priorities": [t.priority for t in pending_tasks],
+        "due_dates": [t.due_date.isoformat() if t.due_date else None for t in pending_tasks]
+    }
+    
+    # Try to get from cache first
+    cached_response = cache.get("recommendations", task_data)
+    if cached_response:
+        return cached_response
+    
+    # Generate new response
+    prompt = build_prompt_recommendation(tasks)
+    response = await query_gpt(prompt)
+    
+    # Cache the response
+    cache.set("recommendations", task_data, response)
+    
+    return response
+
+async def get_project_summary_cached(tasks: List[Task]) -> str:
+    """Get project summary with Redis caching"""
+    # Create cache key data from tasks
+    task_data = {
+        "task_count": len(tasks),
+        "completed_count": len([t for t in tasks if t.completed]),
+        "task_titles": [t.title for t in tasks],
+        "last_updated": max([t.created_at for t in tasks]).isoformat() if tasks else None
+    }
+    
+    # Try to get from cache first
+    cached_response = cache.get("summary", task_data)
+    if cached_response:
+        return cached_response
+    
+    # Generate new response
+    prompt = build_prompt_summary(tasks)
+    response = await query_gpt(prompt)
+    
+    # Cache the response
+    cache.set("summary", task_data, response)
+    
+    return response
+
+async def get_task_recommendations_cached(tasks: List[Task]) -> str:
+    """Get task recommendations with Redis caching"""
+    # Create cache key data from pending tasks
+    pending_tasks = [t for t in tasks if not t.completed]
+    task_data = {
+        "pending_count": len(pending_tasks),
+        "pending_titles": [t.title for t in pending_tasks],
+        "priorities": [t.priority for t in pending_tasks if t.priority],
+        "due_dates": [t.due_date.isoformat() for t in pending_tasks if t.due_date],
+        "last_updated": max([t.created_at for t in tasks]).isoformat() if tasks else None
+    }
+    
+    # Try to get from cache first
+    cached_response = cache.get("recommendations", task_data)
+    if cached_response:
+        return cached_response
+    
+    # Generate new response
+    prompt = build_prompt_recommendation(tasks)
+    response = await query_gpt(prompt)
+    
+    # Cache the response
+    cache.set("recommendations", task_data, response)
+    
+    return response
 
 def get_mock_response(prompt: str) -> str:
     """Return a mock response for testing purposes."""

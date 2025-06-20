@@ -5,7 +5,8 @@ from sqlmodel import Session
 from ..db.session import get_session
 from ..services.task_service import TaskService
 from ..repositories.task_repository import TaskRepository
-from ..agents.gpt_agent import build_prompt_summary, build_prompt_recommendation, query_gpt
+from ..agents.gpt_agent import get_project_summary_cached, get_task_recommendations_cached
+from ..cache.redis_cache import cache
 
 router = APIRouter(prefix="/agent", tags=["AI Agent"])
 
@@ -17,7 +18,7 @@ def get_task_service(repo: TaskRepository = Depends(get_task_repository)) -> Tas
     return TaskService(repo)
 
 @router.get("/summary", response_model=Dict[str, Any])
-async def get_project_summary(task_service: TaskService = Depends(get_task_service)):
+async def get_project_summary_endpoint(task_service: TaskService = Depends(get_task_service)):
     """
     Get an AI-generated summary of the current project status.
     
@@ -29,12 +30,8 @@ async def get_project_summary(task_service: TaskService = Depends(get_task_servi
     try:
         # Get all tasks
         tasks = task_service.get_all_tasks()
-        
-        # Build the prompt with all task details
-        prompt = build_prompt_summary(tasks)
-        
-        # Query GPT for summary
-        summary = await query_gpt(prompt)
+          # Get cached or fresh summary
+        summary = await get_project_summary_cached(tasks)
         
         # Prepare response with metadata
         completed_tasks = len([t for t in tasks if t.completed])
@@ -59,7 +56,7 @@ async def get_project_summary(task_service: TaskService = Depends(get_task_servi
         )
 
 @router.get("/recommendations", response_model=Dict[str, Any])
-async def get_task_recommendations(task_service: TaskService = Depends(get_task_service)):
+async def get_task_recommendations_endpoint(task_service: TaskService = Depends(get_task_service)):
     """
     Get AI-generated task prioritization and productivity recommendations.
     
@@ -72,12 +69,8 @@ async def get_task_recommendations(task_service: TaskService = Depends(get_task_
     try:
         # Get all tasks
         tasks = task_service.get_all_tasks()
-        
-        # Build the recommendation prompt
-        prompt = build_prompt_recommendation(tasks)
-        
-        # Query GPT for recommendations
-        recommendations = await query_gpt(prompt)
+          # Get cached or fresh recommendations
+        recommendations = await get_task_recommendations_cached(tasks)
         
         # Analyze pending tasks for metadata
         pending_tasks = [t for t in tasks if not t.completed]
@@ -107,18 +100,62 @@ async def get_task_recommendations(task_service: TaskService = Depends(get_task_
             detail=f"Failed to generate task recommendations: {str(e)}"
         )
 
+@router.get("/cache/stats")
+async def get_cache_stats():
+    """
+    Get Redis cache statistics and health status.
+    """
+    try:
+        stats = cache.get_cache_stats()
+        return {
+            "cache_stats": stats,
+            "service": "Redis Cache",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to get cache stats: {str(e)}"
+        )
+
+@router.delete("/cache/clear")
+async def clear_cache():
+    """
+    Clear all AI response cache entries.
+    """
+    try:
+        success = cache.clear_all()
+        if success:
+            return {
+                "message": "Cache cleared successfully",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to clear cache"
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to clear cache: {str(e)}"
+        )
+
 @router.get("/health")
 async def agent_health_check():
     """
-    Check if the AI agent is properly configured and accessible.
+    Check if the AI agent and cache are properly configured and accessible.
     """
     import os
     
-    openai_key_configured = bool(os.getenv("OPENAI_API_KEY"))
+    ai_key_configured = bool(os.getenv("AI_API_KEY"))
+    cache_stats = cache.get_cache_stats()
     
     return {
-        "status": "healthy" if openai_key_configured else "configuration_required",
-        "openai_configured": openai_key_configured,
+        "status": "healthy" if ai_key_configured else "configuration_required",
+        "ai_configured": ai_key_configured,
+        "ai_provider": os.getenv("AI_PROVIDER", "mock"),
+        "cache_connected": cache_stats.get("connected", False),
         "service": "TaskPilot AI Agent",
         "version": "1.0.0"
     }
