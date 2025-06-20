@@ -3,6 +3,7 @@ from typing import Dict, Any
 from datetime import datetime
 from sqlmodel import Session
 import logging
+import time
 from ..db.session import get_session
 from ..services.task_service import TaskService
 from ..repositories.task_repository import TaskRepository
@@ -30,6 +31,7 @@ async def get_project_summary_endpoint(task_service: TaskService = Depends(get_t
     - Timeline analysis and recommendations    """
     logger.info("AI Summary requested")
     try:
+        start_time = time.time()
         # Get all tasks
         tasks = task_service.get_all_tasks()
         logger.info(f"Retrieved {len(tasks)} tasks for summary")
@@ -40,7 +42,8 @@ async def get_project_summary_endpoint(task_service: TaskService = Depends(get_t
         completed_tasks = len([t for t in tasks if t.completed])
         pending_tasks = len([t for t in tasks if not t.completed])
         
-        logger.info(f"AI Summary generated - {completed_tasks} completed, {pending_tasks} pending tasks")
+        end_time = time.time()
+        logger.info(f"AI Summary generated - {completed_tasks} completed, {pending_tasks} pending \nTime taken: {end_time - start_time:.2f} seconds")
         
         return {
             "summary": summary,
@@ -73,6 +76,7 @@ async def get_task_recommendations_endpoint(task_service: TaskService = Depends(
     - Risk mitigation for overdue tasks    """
     logger.info("AI Recommendations requested")
     try:
+        start_time = time.time()
         # Get all tasks
         tasks = task_service.get_all_tasks()
         logger.info(f"Retrieved {len(tasks)} tasks for recommendations")
@@ -90,7 +94,8 @@ async def get_task_recommendations_endpoint(task_service: TaskService = Depends(
             if task.due_date and task.due_date < now:
                 overdue_tasks.append(task.id)
         
-        logger.info(f"AI Recommendations generated - {len(pending_tasks)} pending, {high_priority_tasks} high priority, {len(overdue_tasks)} overdue")
+        end_time = time.time()
+        logger.info(f"AI Recommendations generated - {len(pending_tasks)} pending, {high_priority_tasks} high priority, {len(overdue_tasks)} overdue \nTime taken: {end_time - start_time:.2f} seconds")
         
         return {
             "recommendations": recommendations,
