@@ -1,0 +1,85 @@
+{
+  "sample_tasks": [
+    {
+      "task_1": {
+        "title": "Setup CI/CD Pipeline",
+        "description": "Implement automated testing and deployment pipeline for the TaskPilot project using GitHub Actions",
+        "due_date": "2025-06-25T14:00:00",
+        "priority": "high",
+        "tags": ["devops", "automation", "deployment"],
+        "mini_tasks": {
+          "Create GitHub Actions workflow": false,
+          "Setup automated testing": false,
+          "Configure deployment to staging": false,
+          "Setup production deployment": false,
+          "Add status badges to README": false
+        }
+      }
+    },
+    {
+      "task_2": {
+        "title": "Design User Authentication System",
+        "description": "Create a secure authentication system with JWT tokens, password hashing, and role-based access control",
+        "due_date": "2025-06-28T17:30:00",
+        "priority": "high",
+        "tags": ["security", "backend", "authentication"],
+        "mini_tasks": {
+          "Research JWT best practices": true,
+          "Design user model schema": true,
+          "Implement password hashing": false,
+          "Create login/logout endpoints": false,
+          "Add role-based permissions": false,
+          "Write security tests": false
+        }
+      }
+    },
+    {
+      "task_3": {
+        "title": "Create Project Documentation",
+        "description": "Write comprehensive documentation including API docs, setup guide, and user manual",
+        "due_date": "2025-07-01T12:00:00",
+        "priority": "medium",
+        "tags": ["documentation", "api", "user-guide"],
+        "mini_tasks": {
+          "Write API documentation": false,
+          "Create setup/installation guide": false,
+          "Document configuration options": false,
+          "Add code examples": false,
+          "Create troubleshooting section": false
+        }
+      }
+    },
+    {
+      "task_4": {
+        "title": "Optimize Database Performance",
+        "description": "Analyze and improve database query performance, add proper indexing, and implement connection pooling",
+        "due_date": "2025-06-22T16:00:00",
+        "priority": "medium",
+        "tags": ["database", "performance", "optimization"],
+        "mini_tasks": {
+          "Analyze slow queries": true,
+          "Add database indexes": false,
+          "Implement connection pooling": false,
+          "Setup query monitoring": false,
+          "Performance testing": false
+        }
+      }
+    },
+    {
+      "task_5": {
+        "title": "Plan Team Meeting",
+        "description": "Organize weekly team sync meeting to discuss project progress and upcoming milestones",
+        "due_date": "2025-06-21T10:00:00",
+        "priority": "low",
+        "tags": ["meeting", "team", "planning"],
+        "mini_tasks": {
+          "Book meeting room": true,
+          "Send calendar invites": true,
+          "Prepare agenda": false,
+          "Gather status updates": false,
+          "Setup video call link": false
+        }
+      }
+    }
+  ]
+}
