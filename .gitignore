@@ -186,6 +186,17 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+# Environment variables (SECURITY - DO NOT COMMIT!)
+.env
+.env.local
+.env.*.local
+.env.docker
+
+
+# Docker volumes and data
+data/
+docker/data/
+
 # Cursor
 #  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
 #  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
