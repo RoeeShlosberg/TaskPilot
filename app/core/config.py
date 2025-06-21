@@ -8,11 +8,11 @@ class Settings(BaseSettings):
     """
     # Database
     database_url: str = "sqlite:///./taskpilot.db"
-    
-    # Security
+      # Security
     secret_key: str = "your-secret-key-here"  # fallback value
-    algorithm: str = "HS256"
-    access_token_expire_minutes: int = 30
+    jwt_secret_key: str = "your-jwt-secret-key-change-this-in-production"
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 30
       # AI Configuration
     ai_provider: str = "mock"  # openrouter, groq, huggingface, mock
     ai_api_key: Optional[str] = None

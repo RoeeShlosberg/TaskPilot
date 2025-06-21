@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 import logging
 from app.core.config import settings
 from app.db.session import create_db_and_tables
-from app.api import tasks, agent
+from app.api import tasks, agent, users
 
 
 # Configure logging
@@ -43,6 +43,7 @@ def on_startup():
 # Include API routes
 app.include_router(tasks.router, prefix=settings.api_v1_prefix)
 app.include_router(agent.router, prefix=settings.api_v1_prefix)
+app.include_router(users.router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/")

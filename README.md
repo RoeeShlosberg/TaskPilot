@@ -2,7 +2,17 @@
 
 ## Project Overview
 
-TaskPilot is a task management application built with Python and FastAPI. It provides a robust backend API for creating, managing, and querying tasks, with AI-powered features integrated via providers like OpenRouter. The project is fully containerized using Docker and Docker Compose, ensuring a consistent and reproducible environment for both development and production. It utilizes a Redis cache to enhance performance for frequent requests.
+TaskPilot is a **multi-user** task management application built with Python and FastAPI. It provides a secure backend API with **JWT authentication** for creating, managing, and querying tasks, with AI-powered features integrated via providers like OpenRouter. The project is fully containerized using Docker and includes Redis caching for enhanced performance.
+
+## Key Features
+
+- 🔐 **Multi-user support** with JWT authentication
+- 📝 **Complete task management** (CRUD operations)
+- 🤖 **AI-powered recommendations** and summaries
+- 🚀 **Fast and secure** FastAPI backend
+- 📦 **Docker containerized** for easy deployment
+- ⚡ **Redis caching** for performance
+- 📊 **Interactive API documentation** (Swagger UI)
 
 ## Project Architecture
 
@@ -25,12 +35,13 @@ The project is structured with a clear separation of concerns to promote scalabi
 ## Technologies Used
 
 -   **Backend:** Python, FastAPI
+-   **Authentication:** JWT (JSON Web Tokens) with bcrypt password hashing
 -   **ASGI Server:** Uvicorn
+-   **Database:** SQLite with SQLModel (multi-user support)
 -   **Caching:** Redis
 -   **Containerization:** Docker, Docker Compose
--   **Database:** SQLite (persisted via a Docker volume)
--  **AI Integration:** OpenRouter (or other providers as configured)
--   **Logging:** Standard Python logging with FastAPI integration
+-   **AI Integration:** OpenRouter (configurable providers)
+-   **API Documentation:** Automatic Swagger UI generation
 
 ---
 
@@ -40,117 +51,39 @@ The project is structured with a clear separation of concerns to promote scalabi
 
 -   Ensure you have **Docker Desktop** installed and running on your system.
 
-### Step 2: Create and Configure the Environment File (`.env`)
+### Step 2: Configure Environment Variables
 
-The application's behavior is controlled by environment variables. You **must** create a file named `.env` inside the `docker/` directory to store these settings and secrets. This file is the control panel for the application.
-
-#### Detailed Explanation of Each Variable
-
-Here is a line-by-line breakdown of every setting you need to configure in your `.env` file. **Do not commit this file to Git.**
-
--   `SECRET_KEY`
-    -   **Purpose:** This is a critical security key. The application uses it to sign and verify tokens (like for password resets or API authentication). It ensures that data is not tampered with.
-    -   **Action:** You **must** replace the default value with a long, random, and unpredictable string. A compromised key could lead to major security vulnerabilities.
-    -   **How to Generate:** Run `openssl rand -hex 32` in your terminal to generate a strong key.
-
--   `AI_PROVIDER`
-    -   **Purpose:** Defines which AI service the application should connect to. The code is set up to use `openrouter` by default.
-    -   **Action:** For now, leave this as `openrouter`.
-
--   `AI_API_KEY`
-    -   **Purpose:** This is your personal API key for the AI provider you specified above. It's a secret password that gives you access to the AI service.
-    -   **Action:** You **must** replace the placeholder with your actual API key from OpenRouter (or another provider).
-
--   `REDIS_HOST`
-    -   **Purpose:** Tells the FastAPI application the hostname of the Redis cache server. In our `docker-compose.yml`, the Redis service is named `redis`.
-    -   **Action:** Do not change this value. It is set to `redis` so the `web` container can find the `redis` container on Docker's internal network.
-
--   `REDIS_PORT`
-    -   **Purpose:** The port that Redis uses to listen for connections inside the Docker network.
-    -   **Action:** Do not change this value. The standard Redis port is `6379`.
-
--   `REDIS_PASSWORD`
-    -   **Purpose:** A password to protect your Redis cache. While optional, it is **highly recommended** for security, especially in production.
-    -   **Action:** Set a strong, unique password here. The `docker-compose.yml` file is configured to pass this password to both the Redis server and the FastAPI application.
-
--   `REDIS_DB`
-    -   **Purpose:** Redis can maintain multiple databases, identified by a number. `0` is the default database.
-    -   **Action:** You can leave this as `0` unless you have a specific reason to use a different database index.
-
--   `DATABASE_URL`
-    -   **Purpose:** This is the connection string for the application's database. It tells FastAPI where to find and how to connect to the database.
-    -   **Action:** Do not change this value. It is pre-configured to use the `taskpilot.db` SQLite file located in the `/app/data` directory inside the container, which is persisted to your local machine via a Docker volume.
-
--   `APP_NAME`
-    -   **Purpose:** Sets the name of the application, which might be used in API responses or logs.
-    -   **Action:** You can leave this as `TaskPilot` or change it if you wish.
-
--   `DEBUG`
-    -   **Purpose:** Toggles FastAPI's debug mode.
-    -   **Action:** Set to `false` for production. Setting it to `true` will expose detailed error information, which is useful for development but a security risk in a live environment.
-
-#### Complete `.env` Example Template
-
-Navigate to the `docker/` directory, create a file named `.env`, and paste the following content into it. Then, fill in your secret values.
+Create a `.env` file in the `docker/` directory with your configuration:
 
 ```env
-# ------------------------------------------------------------------
-#        TaskPilot Environment Configuration (.env)
-# ------------------------------------------------------------------
-# This file contains all the necessary configuration and secrets
-# for the application. Create this file inside the 'docker/' directory.
-# ------------------------------------------------------------------
+# Security (REQUIRED - Generate with: openssl rand -hex 32)
+SECRET_KEY=your-super-secret-key-change-this-in-production
+JWT_SECRET_KEY=your-jwt-secret-key-change-this-in-production
+JWT_ALGORITHM=HS256
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-# --- Security ---
-# A strong, random string used for security functions (e.g., signing tokens).
-# It's critical that this is kept secret and is a long, unpredictable string.
-# You can generate a new one by running this command in your terminal:
-# openssl rand -hex 32
-SECRET_KEY=d8e6a0b4c1e8f2d7a9c3b5d1f0e9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1
-
-# --- AI Configuration ---
-# Specifies which AI service to use. The application is configured to work
-# with 'openrouter' by default, but could be extended for others like 'openai'.
+# AI Configuration (REQUIRED for AI features)
 AI_PROVIDER=openrouter
+AI_API_KEY=your-openrouter-api-key-here
 
-# Your personal API key from the AI provider specified above.
-# This is a secret and should be treated like a password.
-# The format will vary by provider.
-AI_API_KEY=sk-or-v1-abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234
-
-# --- Redis Cache Configuration ---
-# These variables configure the connection to the Redis cache service.
-# In the Docker environment, you should not need to change these values.
-
-# The hostname for the Redis container on the internal Docker network.
-# 'redis' is the service name defined in docker-compose.yml.
+# Redis Configuration (works with docker-compose)
 REDIS_HOST=redis
-
-# The port that the Redis server listens on inside the network.
 REDIS_PORT=6379
-
-# An optional password for connecting to Redis. It is highly recommended
-# to set a strong password in a production environment.
-REDIS_PASSWORD=a-very-strong-redis-password-123!
-
-# The Redis database instance to use. '0' is the default.
+REDIS_PASSWORD=your-redis-password-here
 REDIS_DB=0
 
-# --- Database Configuration ---
-# The connection string for the database.
-# This is pre-configured for the SQLite database running inside a Docker volume
-# and should not be changed unless you are re-architecting the database setup.
+# Database (SQLite in Docker volume)
 DATABASE_URL=sqlite:///./data/taskpilot.db
 
-# --- General Application Settings ---
-# The public name of the application.
+# App Settings
 APP_NAME=TaskPilot
-
-# Toggles debug mode.
-# 'false' is the standard for production.
-# 'true' will provide more verbose error messages, but can be a security risk.
 DEBUG=false
 ```
+
+**Important:** 
+- Replace `SECRET_KEY` and `JWT_SECRET_KEY` with random strings (use `openssl rand -hex 32`)
+- Add your OpenRouter API key for AI features
+- Set a strong Redis password for security
 
 ### Step 3: Build and Run the Application
 
@@ -186,40 +119,82 @@ All the following commands must be run from within the `docker/` directory.
     docker-compose down -v
     ```
 
-### Step 4: Verify and Access the Application
+### Step 4: Access the Application
 
-Once the containers are running, you can verify that everything is working correctly.
+Once the containers are running:
 
--   **API Documentation (Swagger UI):**
-    The best way to explore all available API endpoints is through the interactive Swagger UI documentation. Open this URL in your browser:
-    [http://localhost:8000/docs](http://localhost:8000/docs)
+-   **API Documentation (Swagger UI):** [http://localhost:8000/docs](http://localhost:8000/docs)
+-   **Health Check:** [http://localhost:8000/health](http://localhost:8000/health)
 
-### Step 5: Example API Usage (Creating a Task)
+### Step 5: Authentication & Usage
 
-Here is a quick example of how to create a new task using `curl` from your terminal. This demonstrates a basic interaction with the API.
+TaskPilot requires user registration and authentication:
 
+**1. Register a new user:**
 ```bash
-curl -X 'POST' \
-  'http://localhost:8000/tasks/' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "title": "Finalize the project README",
-  "description": "Review and update the README.md file with complete setup and usage instructions.",
-  "due_date": "2025-06-21T10:00:00Z"
-}'
+curl -X POST "http://localhost:8000/api/users/register" \
+     -H "Content-Type: application/json" \
+     -d '{"username": "myuser", "email": "user@example.com", "password": "password123"}'
 ```
 
-If successful, the API will respond with the details of the newly created task, including its ID.
+**2. Login to get an access token:**
+```bash
+curl -X POST "http://localhost:8000/api/users/login" \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "username=myuser&password=password123"
+```
+
+**3. Use the token for authenticated requests:**
+```bash
+curl -X POST "http://localhost:8000/api/tasks/" \
+     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "title": "Complete project documentation", 
+       "description": "Update README with multi-user features",
+       "due_date": "2025-06-25T10:00:00",
+       "priority": "high",
+       "tags": ["documentation", "urgent"],
+       "mini_tasks": {"Review content": false, "Add examples": false}
+     }'
+```
+
+**Available Endpoints:**
+- `POST /api/users/register` - Register new user
+- `POST /api/users/login` - Login (returns JWT token) 
+- `GET /api/tasks/` - Get all user's tasks
+- `POST /api/tasks/` - Create new task
+- `GET /api/tasks/{id}` - Get specific task
+- `PUT /api/tasks/{id}` - Update task
+- `DELETE /api/tasks/{id}` - Delete task
+- `GET /api/agent/summary` - AI project summary
+- `GET /api/agent/recommendations` - AI task recommendations
 
 ---
 
-## Project Status & Future Improvements
+## Security & Deployment Notes
 
-This project provides a solid foundation for a task management application. The core API is functional, containerized, and includes caching.
+- **✅ Safe to commit:** All configuration files in this repository are safe to push to Git
+- **❌ Never commit:** The `.env` file contains secrets and is in `.gitignore`
+- **🔐 Production:** Use strong, unique values for all secret keys and passwords
+- **🌐 Multi-user:** Each user's tasks are isolated and secured with JWT authentication
 
-Potential next steps could include:
--   **Adding User Authentication:** Implementing OAuth2 to secure endpoints.
--   **Implementing a Test Suite:** Adding unit and integration tests using `pytest`.
--   **CI/CD Pipeline:** Setting up a pipeline (e.g., with GitHub Actions) to automate testing and deployment.
--   **Adding Linting and Formatting:** Integrating tools like `Ruff` and `Black` to ensure code quality.
+---
+
+## Project Status & Next Steps
+
+TaskPilot is a complete, production-ready multi-user task management API with:
+- ✅ Secure user authentication (JWT)
+- ✅ Complete task CRUD operations  
+- ✅ AI-powered features
+- ✅ Docker containerization
+- ✅ Redis caching
+- ✅ Multi-user data isolation
+
+**Potential enhancements:**
+- CI/CD pipeline for automated testing and deployment
+- Frontend web interface (React/Vue)
+- Real-time notifications (WebSockets)
+- Advanced AI integrations
+- Team collaboration features
+- Mobile app (React Native/Flutter)

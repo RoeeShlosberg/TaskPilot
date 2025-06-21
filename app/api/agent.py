@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from typing import Dict, Any
 from datetime import datetime
 from sqlmodel import Session
@@ -6,44 +6,60 @@ import logging
 import time
 from ..db.session import get_session
 from ..services.task_service import TaskService
-from ..repositories.task_repository import TaskRepository
+from ..models.user_model import User
+from ..api.dependencies import get_current_user
 from ..agents.gpt_agent import get_project_summary_cached, get_task_recommendations_cached
 from ..cache.redis_cache import cache
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/agent", tags=["AI Agent"])
 
-# Dependency injection functions
-def get_task_repository(session: Session = Depends(get_session)) -> TaskRepository:
-    return TaskRepository(session)
-
-def get_task_service(repo: TaskRepository = Depends(get_task_repository)) -> TaskService:
-    return TaskService(repo)
+# Dependency injection function
+def get_task_service(session: Session = Depends(get_session)) -> TaskService:
+    return TaskService(session)
 
 @router.get("/summary", response_model=Dict[str, Any])
-async def get_project_summary_endpoint(task_service: TaskService = Depends(get_task_service)):
+async def get_project_summary_endpoint(
+    task_service: TaskService = Depends(get_task_service),
+    current_user: User = Depends(get_current_user)
+):
     """
-    Get an AI-generated summary of the current project status.
+    Get an AI-generated summary of the current project status for the authenticated user.
     
     Returns a comprehensive analysis of all tasks including:
     - Overall project health and progress
     - Key achievements and critical issues
-    - Timeline analysis and recommendations    """
-    logger.info("AI Summary requested")
+    - Timeline analysis and recommendations
+    """
+    logger.info(f"AI Summary requested for user '{current_user.username}'")
     try:
         start_time = time.time()
-        # Get all tasks
-        tasks = task_service.get_all_tasks()
-        logger.info(f"Retrieved {len(tasks)} tasks for summary")
-          # Get cached or fresh summary
+        # Get all tasks for the current user
+        tasks = task_service.get_all_tasks(current_user.id)
+        logger.info(f"Retrieved {len(tasks)} tasks for summary for user '{current_user.username}'")
+        
+        if not tasks:
+            return {
+                "summary": "No tasks found. Start by creating some tasks to get a summary.",
+                "metadata": {
+                    "total_tasks": 0,
+                    "completed_tasks": 0,
+                    "pending_tasks": 0,
+                    "completion_rate": 0
+                },
+                "generated_at": datetime.utcnow().isoformat(),
+                "prompt_type": "project_summary"
+            }
+
+        # Get cached or fresh summary
         summary = await get_project_summary_cached(tasks)
         
         # Prepare response with metadata
         completed_tasks = len([t for t in tasks if t.completed])
-        pending_tasks = len([t for t in tasks if not t.completed])
+        pending_tasks = len(tasks) - completed_tasks
         
         end_time = time.time()
-        logger.info(f"AI Summary generated - {completed_tasks} completed, {pending_tasks} pending \nTime taken: {end_time - start_time:.2f} seconds")
+        logger.info(f"AI Summary generated for user '{current_user.username}' - {completed_tasks} completed, {pending_tasks} pending. Time taken: {end_time - start_time:.2f} seconds")
         
         return {
             "summary": summary,
@@ -58,61 +74,73 @@ async def get_project_summary_endpoint(task_service: TaskService = Depends(get_t
         }
         
     except Exception as e:
-        logger.error(f"Error generating project summary: {str(e)}")
+        logger.error(f"Error generating project summary for user '{current_user.username}': {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate project summary: {str(e)}"
         )
 
 @router.get("/recommendations", response_model=Dict[str, Any])
-async def get_task_recommendations_endpoint(task_service: TaskService = Depends(get_task_service)):
+async def get_task_recommendations_endpoint(
+    task_service: TaskService = Depends(get_task_service),
+    current_user: User = Depends(get_current_user)
+):
     """
-    Get AI-generated task prioritization and productivity recommendations.
+    Get AI-generated task prioritization and productivity recommendations for the authenticated user.
     
     Returns intelligent suggestions for:
     - Immediate priority tasks
     - Weekly focus areas
     - Time management strategies
-    - Risk mitigation for overdue tasks    """
-    logger.info("AI Recommendations requested")
+    - Risk mitigation for overdue tasks
+    """
+    logger.info(f"AI Recommendations requested for user '{current_user.username}'")
     try:
         start_time = time.time()
-        # Get all tasks
-        tasks = task_service.get_all_tasks()
-        logger.info(f"Retrieved {len(tasks)} tasks for recommendations")
-        
+        # Get all tasks for the current user
+        tasks = task_service.get_all_tasks(current_user.id)
+        logger.info(f"Retrieved {len(tasks)} tasks for recommendations for user '{current_user.username}'")
+
+        if not tasks:
+            return {
+                "recommendations": "No tasks found. Add some tasks to get recommendations.",
+                "metadata": {
+                    "pending_tasks": 0,
+                    "high_priority_tasks": 0,
+                    "overdue_tasks": 0
+                },
+                "generated_at": datetime.utcnow().isoformat(),
+                "prompt_type": "task_recommendations"
+            }
+
         # Get cached or fresh recommendations
         recommendations = await get_task_recommendations_cached(tasks)
         
         # Analyze pending tasks for metadata
         pending_tasks = [t for t in tasks if not t.completed]
-        high_priority_tasks = len([t for t in pending_tasks if t.priority == "high"])
-        overdue_tasks = []
+        high_priority_tasks = len([t for t in pending_tasks if t.priority and t.priority.lower() == "high"])
         
         now = datetime.utcnow()
-        for task in pending_tasks:
-            if task.due_date and task.due_date < now:
-                overdue_tasks.append(task.id)
+        overdue_task_count = sum(1 for task in pending_tasks if task.due_date and task.due_date < now)
         
         end_time = time.time()
-        logger.info(f"AI Recommendations generated - {len(pending_tasks)} pending, {high_priority_tasks} high priority, {len(overdue_tasks)} overdue \nTime taken: {end_time - start_time:.2f} seconds")
+        logger.info(f"AI Recommendations generated for user '{current_user.username}' - {len(pending_tasks)} pending, {high_priority_tasks} high priority, {overdue_task_count} overdue. Time taken: {end_time - start_time:.2f} seconds")
         
         return {
             "recommendations": recommendations,
             "metadata": {
-                "total_pending_tasks": len(pending_tasks),
+                "pending_tasks": len(pending_tasks),
                 "high_priority_tasks": high_priority_tasks,
-                "overdue_tasks": len(overdue_tasks),
-                "overdue_task_ids": overdue_tasks
+                "overdue_tasks": overdue_task_count
             },
             "generated_at": datetime.utcnow().isoformat(),
             "prompt_type": "task_recommendations"
         }
         
     except Exception as e:
-        logger.error(f"Error generating task recommendations: {str(e)}")
+        logger.error(f"Error generating task recommendations for user '{current_user.username}': {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate task recommendations: {str(e)}"
         )
 
