@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:  # TaskPilot FastAPI Application
+  web:
+    build: 
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: taskpilot-api
+    ports:
+      - "8000:8000"
+    environment:
+      # Database
+      - DATABASE_URL=sqlite:///./data/taskpilot.db
+      
+      # Security
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      
+      # AI Configuration
+      - AI_PROVIDER=${AI_PROVIDER:-openrouter}
+      - AI_API_KEY=${AI_API_KEY}
+        # Redis Configuration (pointing to redis service)
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - REDIS_DB=0
+      
+      # App settings
+      - APP_NAME=TaskPilot
+      - DEBUG=false
+    volumes:
+      - ../data:/app/data  # Persist SQLite database
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - taskpilot-network
+    restart: unless-stopped
+
+  # Redis Cache Service
+  redis:
+    image: redis:7-alpine
+    container_name: taskpilot-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data  # Persist Redis data
+    networks:
+      - taskpilot-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+# Networks
+networks:
+  taskpilot-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  redis-data:
+    driver: local
