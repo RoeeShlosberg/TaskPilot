@@ -13,6 +13,8 @@ TaskPilot is a **multi-user** task management application built with Python and 
 - 📦 **Docker containerized** for easy deployment
 - ⚡ **Redis caching** for performance
 - 📊 **Interactive API documentation** (Swagger UI)
+- 🧪 **Comprehensive testing** with pytest
+- 🔄 **CI/CD ready** for automated deployment
 
 ## Project Architecture
 
@@ -42,6 +44,86 @@ The project is structured with a clear separation of concerns to promote scalabi
 -   **Containerization:** Docker, Docker Compose
 -   **AI Integration:** OpenRouter (configurable providers)
 -   **API Documentation:** Automatic Swagger UI generation
+-   **Testing:** pytest, pytest-cov, httpx for comprehensive testing
+-   **CI/CD:** Ready for GitHub Actions and cloud deployment
+
+---
+
+## 🧪 Testing
+
+TaskPilot includes a solid testing suite covering authentication, task management, AI integration, and health checks.
+
+### Running Tests
+
+**Prerequisites:** Ensure Docker containers are running (`docker-compose up -d`)
+
+```bash
+# Navigate to docker directory
+cd docker
+
+# Run all tests
+docker-compose exec web pytest tests/ -v
+
+# Run tests with coverage report
+docker-compose exec web pytest tests/ -v --cov=app
+
+# Run specific test files
+docker-compose exec web pytest tests/test_auth_fixed.py -v
+docker-compose exec web pytest tests/test_tasks_fixed.py -v
+docker-compose exec web pytest tests/test_agent_fixed.py -v
+```
+
+### Test Structure
+```
+tests/
+├── test_auth_fixed.py     # Authentication & user management
+├── test_tasks_fixed.py    # Task CRUD operations
+├── test_agent_fixed.py    # AI integration endpoints
+├── test_health_fixed.py   # Health checks
+└── conftest.py           # Test configuration
+```
+
+The test suite ensures:
+- 🔐 **Security**: Users can only access their own data
+- 📝 **Functionality**: All CRUD operations work correctly
+- 🤖 **AI Integration**: Agent endpoints respond properly
+- 🏥 **Health**: Service monitoring works as expected
+
+---
+
+## 🚀 CI/CD & Deployment
+
+TaskPilot is designed for easy deployment with modern CI/CD practices.
+
+### GitHub Actions Ready
+
+The project structure supports automated testing and deployment. Simply add a GitHub Actions workflow file to automatically:
+- Run tests on every push
+- Build Docker containers
+- Deploy to production on merge to main
+
+### Render.com Deployment (Recommended)
+
+1. **Fork this repository**
+2. **Connect to Render.com**
+3. **Create a Web Service** from your GitHub repo
+4. **Set environment variables** in Render dashboard
+5. **Deploy automatically** - uses included `render.yaml`
+
+### Manual Deployment
+
+```bash
+# Build and run production image
+docker build -t taskpilot:latest .
+docker run -p 8000:8000 --env-file .env taskpilot:latest
+```
+
+**Production Environment Variables:**
+- `SECRET_KEY` - Strong secret for app security
+- `JWT_SECRET_KEY` - JWT token signing key  
+- `AI_API_KEY` - Your OpenRouter API key
+- `REDIS_PASSWORD` - Secure Redis password
+- `DEBUG=false` - Disable debug mode
 
 ---
 
@@ -192,7 +274,6 @@ TaskPilot is a complete, production-ready multi-user task management API with:
 - ✅ Multi-user data isolation
 
 **Potential enhancements:**
-- CI/CD pipeline for automated testing and deployment
 - Frontend web interface (React/Vue)
 - Real-time notifications (WebSockets)
 - Advanced AI integrations

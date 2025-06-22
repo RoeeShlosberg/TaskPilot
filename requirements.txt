@@ -12,3 +12,11 @@ passlib[bcrypt]==1.7.4
 # For JWT token creation and verification
 python-jose[cryptography]==3.3.0
 python-multipart==0.0.9
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-xdist==3.5.0
+httpx==0.25.2
+requests==2.31.0
