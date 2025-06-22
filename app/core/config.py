@@ -1,6 +1,9 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
+import os
+from pydantic import Field
 
+IS_RENDER = os.getenv("RENDER", "false").lower() == "true"
 
 class Settings(BaseSettings):
     """
@@ -20,7 +23,7 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     
     # Redis Configuration
-    redis_host: str = "localhost"
+    redis_host: str = Field(default="redis" if not IS_RENDER else ..., env="REDIS_HOST")
     redis_port: int = 6379
     redis_password: Optional[str] = None
     redis_db: int = 0
