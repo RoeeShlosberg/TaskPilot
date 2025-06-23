@@ -23,10 +23,10 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     
     # Redis Configuration
-    redis_host: str = Field(default="redis" if not IS_RENDER else ..., env="REDIS_HOST")
-    redis_port: int = 6379
-    redis_password: Optional[str] = None
-    redis_db: int = 0
+    redis_host: str = Field(default="redis" if not IS_RENDER else "localhost", env="REDIS_HOST")
+    redis_port: int = Field(default=6379, env="REDIS_PORT")
+    redis_password: Optional[str] = Field(default=None, env="REDIS_PASSWORD")
+    redis_db: int = Field(default=0, env="REDIS_DB")
     redis_ttl: int = 3600  # Cache TTL in seconds (1 hour default)
     
     # App settings
