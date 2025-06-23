@@ -1,0 +1,105 @@
+.main-page {
+  min-height: 100vh;
+  background: #f0f4fa;
+  padding: 2rem;
+}
+
+.main-page-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+.main-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.main-page-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.add-task-btn {
+  background-color: #19bb32;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.add-task-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.add-task-btn:hover {
+  background-color: #1a9331;
+}
+
+.agent-btn {
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.agent-btn:hover {
+  background-color: #1565c0;
+}
+
+.agent-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.no-tasks-message {
+  color: #666;
+  font-size: 1.9rem;
+  text-align: center;
+  font-style: italic;
+}
+
+.task-list-title {
+  font-size: 1.9rem;
+  font-weight: bold;
+  color: #333;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+  text-decoration-color: #1976d2;
+}
+
+.main-page-title-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}

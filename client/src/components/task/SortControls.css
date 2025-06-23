@@ -1,0 +1,71 @@
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f5f8ff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sort-label {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.sort-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  color: #333;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.sort-select:hover, .sort-select:focus {
+  border-color: #1976d2;
+  outline: none;
+}
+
+.sort-select option {
+  padding: 0.5rem;
+}
+
+.sort-direction {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.sort-direction-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  color: #666;
+  transition: color 0.2s, background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sort-direction-btn:hover {
+  color: #1976d2;
+  background-color: rgba(25, 118, 210, 0.1);
+}
+
+.sort-direction-btn.active {
+  color: #1976d2;
+  background-color: rgba(25, 118, 210, 0.15);
+}
+
+.sort-direction-btn svg {
+  width: 18px;
+  height: 18px;
+}
