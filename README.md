@@ -67,7 +67,7 @@ TaskPilot/
 ### Running the Application
 ```bash
 cd docker
-docker-compose up --build -d
+docker compose up --build -d
 ```
 
 The application will be available at:
@@ -114,10 +114,10 @@ AI_API_KEY=your-openrouter-api-key
 ## Testing
 ```bash
 # Backend tests
-docker-compose exec web pytest tests/ -v
+docker compose exec web pytest tests/ -v
 
 # Client build verification
-docker-compose ps client
+docker compose ps client
 ```
 
 ## Deployment

@@ -19,6 +19,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose-plugin
+        docker compose version
+      
     - name: Create .env file for testing
       run: |
         cd docker
@@ -42,7 +51,7 @@ jobs:
     - name: Build and start services
       run: |
         cd docker
-        docker-compose up -d --build
+        docker compose up -d --build
         
     - name: Wait for services to be ready
       run: |
@@ -50,9 +59,9 @@ jobs:
         
         # Check if client container is running
         echo "🔍 Checking client container status..."
-        if ! docker-compose ps | grep -q "client.*Up"; then
+        if ! docker compose ps | grep -q "client.*Up"; then
           echo "❌ Client container failed to start"
-          docker-compose logs client
+          docker compose logs client
           exit 1
         else
           echo "✅ Client container is running"
@@ -60,28 +69,28 @@ jobs:
         
         # Wait for web service to be healthy
         echo "🔍 Waiting for web service to be healthy..."
-        timeout 60s bash -c 'until docker-compose exec -T web curl -f http://localhost:8000/health; do sleep 2; done'
+        timeout 60s bash -c 'until docker compose exec -T web curl -f http://localhost:8000/health; do sleep 2; done'
         
     - name: Run tests
       run: |
         cd docker
-        docker-compose exec -T web pytest tests/ -v --tb=short
+        docker compose exec -T web pytest tests/ -v --tb=short
         
     - name: Cleanup
       if: always()
       run: |
         cd docker
-        docker-compose down -v
-        docker-compose rm -f
+        docker compose down -v
+        docker compose rm -f
         
     - name: Show logs on failure
       if: failure()
       run: |
         cd docker
         echo "📜 Web logs:"
-        docker-compose logs web || true
+        docker compose logs web || true
         echo "📜 Client logs:"
-        docker-compose logs client || true
+        docker compose logs client || true
 
   deploy:
     name: Deploy to Production
