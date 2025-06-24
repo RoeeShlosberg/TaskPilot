@@ -28,7 +28,19 @@ export default function MainPage() {
   const [agentError, setAgentError] = useState<string | null>(null);
   const [sortField, setSortField] = useState<SortField>('due_date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const navigate = useNavigate();
+
+  // Get all unique tags from tasks
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    tasks.forEach(task => {
+      if (task.tags && Array.isArray(task.tags)) {
+        task.tags.forEach(tag => tagSet.add(tag));
+      }
+    });
+    return Array.from(tagSet).sort();
+  }, [tasks]);
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -36,9 +48,15 @@ export default function MainPage() {
       navigate('/');
     }
   }, [navigate]);
+  
   useEffect(() => {
     fetchTasks();
   }, []);
+
+  // Reset selected tags when all tags change (e.g., when tasks are loaded)
+  useEffect(() => {
+    setSelectedTags([]);
+  }, [allTags.length]);
 
   const fetchTasks = async () => {
     try {
@@ -103,6 +121,7 @@ export default function MainPage() {
       setAgentLoading(false);
     }
   };
+  
   const handleCloseAgentResponse = () => {
     setShowSummary(false);
     setShowRecommendations(false);
@@ -112,12 +131,31 @@ export default function MainPage() {
     setSortField(field);
     setSortDirection(direction);
   };
+
+  const handleTagFilterChange = (tags: string[]) => {
+    setSelectedTags(tags);
+  };
   
-  // Sort tasks based on current sort field and direction
-  const sortedTasks = useMemo(() => {
+  // Filter and sort tasks based on current filter and sort settings
+  const filteredAndSortedTasks = useMemo(() => {
     if (!tasks.length) return [];
     
-    return [...tasks].sort((a, b) => {
+    // First, filter by tags if any are selected
+    let filtered = tasks;
+    if (selectedTags.length > 0) {
+      filtered = tasks.filter(task => {
+        // If the task has no tags, and we're not filtering out tasks without tags, include it
+        if (!task.tags || !Array.isArray(task.tags) || task.tags.length === 0) {
+          return false; // Exclude tasks with no tags when filtering
+        }
+        
+        // Check if the task has at least one of the selected tags
+        return task.tags.some(tag => selectedTags.includes(tag));
+      });
+    }
+    
+    // Then sort the filtered tasks
+    return [...filtered].sort((a, b) => {
       let comparison = 0;
       
       if (sortField === 'due_date') {
@@ -137,8 +175,9 @@ export default function MainPage() {
       
       return sortDirection === 'asc' ? comparison : -comparison;
     });
-  }, [tasks, sortField, sortDirection]);
-    return (
+  }, [tasks, sortField, sortDirection, selectedTags]);
+  
+  return (
     <div className="main-page">
       <Header />
       <div className="main-page-header">
@@ -148,7 +187,10 @@ export default function MainPage() {
             <SortControls 
               sortField={sortField} 
               sortDirection={sortDirection} 
-              onSortChange={handleSortChange} 
+              onSortChange={handleSortChange}
+              allTags={allTags}
+              selectedTags={selectedTags}
+              onTagFilterChange={handleTagFilterChange}
             />
           )}
         </div>
@@ -159,24 +201,31 @@ export default function MainPage() {
               <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
             </svg>
             Summarize
-          </button>          <button className="agent-btn" onClick={handleRecommendationsClick}>
+          </button>
+          <button className="agent-btn" onClick={handleRecommendationsClick}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
             Recommend
-          </button><button className="add-task-btn" onClick={() => setShowAddForm(true)}>
+          </button>
+          <button className="add-task-btn" onClick={() => setShowAddForm(true)}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 00-1 1v5H4a1 1 0 100 2h5v5a1 1 0 102 0v-5h5a1 1 0 100-2h-5V4a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
             Add Task
           </button>
-        </div>      </div>      <main className="main-page-content">
+        </div>
+      </div>
+      
+      <main className="main-page-content">
         {error ? (
           <p className="error-message">{error}</p>
         ) : tasks.length === 0 ? (
           <p className="no-tasks-message">No tasks found. Click "Add Task" to get started!</p>
+        ) : filteredAndSortedTasks.length === 0 && selectedTags.length > 0 ? (
+          <p className="no-tasks-message">No tasks match the selected tag filters.</p>
         ) : (
-          <TaskList tasks={sortedTasks} onTaskUpdate={fetchTasks} />
+          <TaskList tasks={filteredAndSortedTasks} onTaskUpdate={fetchTasks} />
         )}
       </main>
       

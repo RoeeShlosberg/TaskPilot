@@ -34,6 +34,14 @@ const AgentResponseBox: React.FC<AgentResponseBoxProps> = ({
     return date.toLocaleString();
   };
 
+  // Convert Markdown-style bold (**text**) to HTML bold tags
+  const formatText = (text: string) => {
+    if (!text) return '';
+    
+    // Replace **text** with <b>text</b>
+    return text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  };
+
   return (
     <div className="agent-response-overlay">
       <div className="agent-response-box">
@@ -55,13 +63,13 @@ const AgentResponseBox: React.FC<AgentResponseBoxProps> = ({
               <p>Error: {error}</p>
             </div>
           ) : (
-            <>
-              <div className="agent-response-text">
+            <>              <div className="agent-response-text">
                 {responseContent && responseContent.split('\n').map((line, index) => (
-                  <React.Fragment key={index}>
-                    {line}
-                    <br />
-                  </React.Fragment>
+                  <div 
+                    key={index} 
+                    dangerouslySetInnerHTML={{ __html: formatText(line) }}
+                    style={{ marginBottom: '0.5rem' }}
+                  />
                 ))}
               </div>
 

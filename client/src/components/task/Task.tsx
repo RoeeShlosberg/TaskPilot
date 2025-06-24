@@ -13,12 +13,14 @@ interface TaskProps {
   priority?: 'low' | 'medium' | 'high';
   mini_tasks?: MiniTasks;
   completed?: boolean;
+  tags?: string[];
   id?: number;
   onTaskUpdate?: () => void; // Callback to refresh task list
 }
 
-const Task: React.FC<TaskProps> = ({ title, description, due_date, priority, mini_tasks = {}, completed = false, id, onTaskUpdate }) => {  const [isExpanded, setIsExpanded] = useState(false);
+const Task: React.FC<TaskProps> = ({ title, description, due_date, priority, mini_tasks = {}, completed = false, tags = [], id, onTaskUpdate }) => {  const [isExpanded, setIsExpanded] = useState(false);
   const [newMiniTask, setNewMiniTask] = useState('');
+  const [newTag, setNewTag] = useState('');
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isEditingDueDate, setIsEditingDueDate] = useState(false);
@@ -324,6 +326,64 @@ const Task: React.FC<TaskProps> = ({ title, description, due_date, priority, min
     }
   };
 
+  const handleDeleteTag = async (tagToDelete: string) => {
+    if (!id) {
+      console.log('No task ID available');
+      return;
+    }
+
+    try {
+      // Filter out the tag to delete
+      const updatedTags = tags.filter(tag => tag !== tagToDelete);
+      
+      // Use taskService to update the task
+      await taskService.updateTask(id, {
+        tags: updatedTags
+      });
+      
+      // Call the callback to refresh the task list
+      if (onTaskUpdate) {
+        onTaskUpdate();
+      }
+    } catch (error: any) {
+      console.error('Failed to delete tag:', error);
+      alert(`Error: ${error?.message || error}`);
+    }
+  };
+
+  const handleAddTag = async () => {
+    if (!newTag.trim() || !id) {
+      return;
+    }
+
+    try {
+      // Check if tag already exists
+      if (tags.includes(newTag.trim())) {
+        alert('This tag already exists!');
+        return;
+      }
+
+      // Create a new tags array with the new tag
+      const updatedTags = [...tags, newTag.trim()];
+      
+      // Use taskService to update the task
+      await taskService.updateTask(id, {
+        tags: updatedTags
+      });
+      
+      // Clear the input
+      setNewTag('');
+      
+      // Call the callback to refresh the task list
+      if (onTaskUpdate) {
+        onTaskUpdate();
+      }
+    } catch (error: any) {
+      console.error('Failed to add tag:', error);
+      alert(`Error: ${error?.message || error}`);
+    }
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleAddMiniTask();
@@ -353,8 +413,7 @@ const Task: React.FC<TaskProps> = ({ title, description, due_date, priority, min
           className={`task-title ${completed ? 'completed' : ''}`}
           onClick={toggleExpand}        >
           {title}
-        </span>
-        <div 
+        </span>        <div 
           className="task-due-date-container"
           ref={dueDateRef}
         >
@@ -384,7 +443,30 @@ const Task: React.FC<TaskProps> = ({ title, description, due_date, priority, min
               {new Date(due_date).toLocaleDateString()}
             </span>
           )}
-        </div>
+        </div>        {/* Tags display - show only 1 tag in closed view */}
+        {tags && Array.isArray(tags) && tags.length > 0 && (
+          <div className="task-tags-container">
+            <span className="task-tag">
+              {tags[0]}
+              {isExpanded && (
+                <span 
+                  className="tag-delete" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteTag(tags[0]);
+                  }}
+                  title="Remove tag"
+                >
+                  ×
+                </span>
+              )}
+            </span>
+            {tags.length > 1 && (
+              <span className="task-tag-count">+{tags.length - 1}</span>
+            )}
+          </div>
+        )}
+        
         <div className="task-priority-container" ref={priorityPickerRef}>
           <div 
             className={`task-priority ${priority || 'none'}`}
@@ -470,9 +552,58 @@ const Task: React.FC<TaskProps> = ({ title, description, due_date, priority, min
                 placeholder="Add new mini-task..."
               />
             </div>
-          </div>
-          
-          <div className="task-actions">
+          </div>          <div className="task-actions-row">          {/* All tags in expanded view */}
+            <div className="task-expanded-tags">
+              {tags && Array.isArray(tags) && tags.length > 0 ? (
+                <>                  {tags.map((tag, index) => (
+                    <span key={index} className="task-expanded-tag">
+                      {tag}
+                      <span 
+                        className="tag-delete" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTag(tag);
+                        }}
+                        title="Remove tag"
+                      >
+                        ×
+                      </span>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    className="add-tag-input"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddTag();
+                      }
+                    }}
+                    placeholder="Add tag..."
+                  />
+                </>
+              ) : (
+                <>
+                  <span className="no-tags">No tags</span>
+                  <input
+                    type="text"
+                    className="add-tag-input"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddTag();
+                      }
+                    }}
+                    placeholder="Add tag..."
+                  />
+                </>
+              )}
+            </div>
+            
             <button 
               className="delete-task-btn"
               onClick={() => setShowDeleteConfirmation(true)}
@@ -480,8 +611,7 @@ const Task: React.FC<TaskProps> = ({ title, description, due_date, priority, min
               Delete Task
             </button>
           </div>
-          
-          {showDeleteConfirmation && (
+            {showDeleteConfirmation && (
             <div className="delete-confirmation">
               <p>Are you sure you want to delete this task?</p>
               <div className="delete-confirmation-buttons">

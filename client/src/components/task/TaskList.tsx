@@ -14,6 +14,7 @@ interface TaskItem {
   priority?: 'low' | 'medium' | 'high';
   mini_tasks?: MiniTasks;
   completed?: boolean;
+  tags?: string[];
 }
 
 interface TaskListProps {
@@ -33,6 +34,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onTaskUpdate }) => {
           priority={task.priority}
           mini_tasks={task.mini_tasks}
           completed={task.completed}
+          tags={task.tags}
           onTaskUpdate={onTaskUpdate}
         />
       ))}

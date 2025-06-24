@@ -1,7 +1,7 @@
 .task {
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 0.5rem;
+  padding: 0.75rem;
   margin: 0.5rem 0;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -14,9 +14,11 @@
 }
 
 .task-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 30px minmax(100px, 1.5fr) 100px 100px 40px 30px;
   align-items: center;
-  justify-content: space-between;
+  gap: 46px;
+  padding: 0 5px;
 }
 
 .task-checkbox {
@@ -24,7 +26,6 @@
   height: 20px;
   border: 2px solid #1976D2;
   border-radius: 50%;
-  margin-right: 1rem;
   cursor: pointer;
   transition: background-color 0.2s, border-color 0.2s;
 }
@@ -40,13 +41,13 @@
 
 .task-title {
   font-weight: bold;
-  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 300px;
   font-size: 1.2rem;
   cursor: pointer;
+  padding-right: 5px;
+  max-width: 100%;
 }
 
 .task-title.completed {
@@ -56,13 +57,13 @@
 }
 
 .task-due-date {
-  margin: 0 1rem;
   color: #555;
   font-size: 1.2rem;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
   transition: background-color 0.2s;
+  text-align: left;
 }
 
 .task-due-date:hover {
@@ -73,12 +74,12 @@
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
 }
 
 .due-date-edit {
   display: flex;
   align-items: center;
-  margin: 0 1rem;
 }
 
 .due-date-input {
@@ -139,6 +140,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .task-priority.low {
@@ -383,9 +385,10 @@
   font-style: italic;
 }
 
-.task-actions {
+.task-actions-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #eee;
@@ -455,4 +458,146 @@
 
 .cancel-delete-btn:hover {
   background-color: #e0e0e0;
+}
+
+.task-tags-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+  overflow: visible; /* Change from hidden to visible */
+  justify-content: flex-start;
+  position: relative; /* Add position relative */
+  min-width: 150px; /* Ensure minimum width for tags */}
+
+@media (max-width: 768px) {
+  .task-header {
+    grid-template-columns: 30px minmax(80px, 1fr) 90px 80px 35px 30px;
+    gap: 5px;
+  }
+}
+
+.task-tag {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 3px 10px; /* Increased padding */
+  border-radius: 12px;
+  font-size: 0.85rem; /* Increased font size from 0.75rem */
+  font-weight: 500;
+  white-space: nowrap;
+  border: 1px solid #bbdefb;
+  display: inline-block;
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-tag-count {
+  background-color: #1976d2;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.task-expanded-tag {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 4px 10px;
+  padding-left: 12px; /* Add extra padding on the left for the delete button */
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid #bbdefb;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  margin-right: 4px;
+}
+
+.task-expanded-tag:hover .tag-delete {
+  opacity: 1;
+}
+
+/* Updated add tag styles */
+.add-tag-container {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  gap: 8px;
+}
+
+.add-tag-input {
+  padding: 6px 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  background-color: #f5f5f5;
+  width: 100px;
+  transition: width 0.3s ease;
+}
+
+.add-tag-input:focus {
+  width: 120px;
+  background-color: white;
+  outline: none;
+  border-color: #1976d2;
+}
+
+/* Updated task expanded tags container */
+.task-expanded-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.no-tags {
+  color: #999;
+  font-style: italic;
+  font-size: 0.9rem;
+  margin-right: 8px;
+}
+
+.tag-delete {
+  opacity: 0; /* Hidden by default */
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #ffebee;
+  color: #d32f2f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
+  line-height: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  z-index: 2;
+}
+
+.task-tag:hover .tag-delete,
+.task-expanded-tag:hover .tag-delete {
+  opacity: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.tag-delete:hover {
+  background-color: #f44336;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
 }
