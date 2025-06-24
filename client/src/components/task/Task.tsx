@@ -350,21 +350,23 @@ const Task: React.FC<TaskProps> = ({ title, description, due_date, priority, min
       alert(`Error: ${error?.message || error}`);
     }
   };
-
   const handleAddTag = async () => {
     if (!newTag.trim() || !id) {
       return;
     }
 
     try {
+      // Initialize tags as an empty array if it's null or undefined
+      const currentTags = Array.isArray(tags) ? tags : [];
+      
       // Check if tag already exists
-      if (tags.includes(newTag.trim())) {
+      if (currentTags.includes(newTag.trim())) {
         alert('This tag already exists!');
         return;
       }
 
       // Create a new tags array with the new tag
-      const updatedTags = [...tags, newTag.trim()];
+      const updatedTags = [...currentTags, newTag.trim()];
       
       // Use taskService to update the task
       await taskService.updateTask(id, {

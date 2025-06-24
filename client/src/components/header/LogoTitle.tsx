@@ -1,6 +1,7 @@
 import React from 'react';
 import './LogoTitle.css';
-import logo from '/logo.svg';
+// Import logo from the assets directory we just created
+import logo from '../../assets/logo.svg';
 
 const LogoTitle: React.FC = () => {
   return (

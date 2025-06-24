@@ -1,6 +1,7 @@
 version: '3.8'
 
-services:  # TaskPilot FastAPI Application
+services:
+  # TaskPilot FastAPI Application
   web:
     build: 
       context: ..
@@ -18,11 +19,14 @@ services:  # TaskPilot FastAPI Application
       # AI Configuration
       - AI_PROVIDER=${AI_PROVIDER:-openrouter}
       - AI_API_KEY=${AI_API_KEY}
-        # Redis Configuration (pointing to redis service)
+      # Redis Configuration (pointing to redis service)
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-}
       - REDIS_DB=0
+      
+      # CORS settings
+      - CORS_ORIGINS=http://localhost,http://client
       
       # App settings
       - APP_NAME=TaskPilot
@@ -32,6 +36,20 @@ services:  # TaskPilot FastAPI Application
     depends_on:
       redis:
         condition: service_healthy
+    networks:
+      - taskpilot-network
+    restart: unless-stopped
+
+  # TaskPilot React Client
+  client:
+    build:
+      context: ..
+      dockerfile: docker/client.DockerFile
+    container_name: taskpilot-client
+    ports:
+      - "80:80"
+    depends_on:
+      - web
     networks:
       - taskpilot-network
     restart: unless-stopped
