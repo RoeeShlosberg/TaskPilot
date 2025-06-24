@@ -203,3 +203,31 @@ docker/data/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# client
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+*.sqlite3
+*.db
+
+# Node/React
+node_modules/
+dist/
+.vite/
+*.log
+
+# VSCode/OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Test/coverage
+coverage/
+*.cover
+*.py,cover
+htmlcov/
+.cache/

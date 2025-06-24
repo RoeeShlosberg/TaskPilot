@@ -1,0 +1,34 @@
+.login-page {
+  min-height: 100vh;
+  height: 100vh;
+  background: #f0f4fa;
+  overflow: hidden;
+}
+
+.login-page-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  height: 100vh;
+  gap: 32px;
+}
+
+.login-page-link-container {
+  margin-top: 0rem;
+  text-align: center;
+  font-size: large;
+}
+
+.login-page-link {
+  color: #1976d2;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.login-page-link:hover {
+  color: #125ea2;
+}

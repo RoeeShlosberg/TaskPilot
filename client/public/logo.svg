@@ -1,0 +1,8 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Plane body -->
+  <polygon points="8,40 44,24 8,8 16,24" fill="#1976D2" stroke="#1976D2" stroke-width="2"/>
+  <!-- Plane wing (checkmark) -->
+  <polyline points="8,32 16,40 24,28" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Plane window -->
+  <circle cx="36" cy="24" r="2" fill="#fff"/>
+</svg>

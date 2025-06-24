@@ -1,0 +1,118 @@
+.main-page {
+  min-height: 100vh;
+  background: #f0f4fa;
+  padding: 1rem 0.25rem; /* Further reduced horizontal padding */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Left align instead of center */
+}
+
+.main-page-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1600px; /* Further increased max-width */
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  margin-left: 0.25rem; /* Reduce left margin */
+}
+
+.main-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 1600px; /* Further increased max-width */
+  margin-left: 0.25rem; /* Reduce left margin */
+}
+
+.main-page-actions {
+  display: flex;
+  flex-direction: column; /* Changed from row to column */
+  gap: 0.75rem; /* Adjusted gap */
+  align-items: flex-end; /* Align buttons to the right */
+}
+
+.add-task-btn {
+  background-color: #19bb32;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%; /* Ensure all buttons have the same width */
+}
+
+.add-task-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.add-task-btn:hover {
+  background-color: #1a9331;
+}
+
+.agent-btn {
+  background-color: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%; /* Ensure all buttons have the same width */
+}
+
+.agent-btn:hover {
+  background-color: #1565c0;
+}
+
+.agent-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 1.2rem;
+  text-align: left;
+  width: 100%;
+}
+
+.no-tasks-message {
+  color: #666;
+  font-size: 1.2rem;
+  text-align: left;
+  font-style: italic;
+  width: 100%;
+}
+
+.task-list-title {
+  font-size: 1.9rem;
+  font-weight: bold;
+  color: #333;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+  text-decoration-color: #1976d2;
+  margin-bottom: 0.5rem;
+}
+
+.main-page-title-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}

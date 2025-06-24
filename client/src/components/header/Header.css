@@ -1,0 +1,29 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  padding-left: 0; /* Remove left padding */
+  background: none;
+  position: relative;
+  width: 100%;
+  max-width: 1600px; /* Further increased max-width */
+  box-sizing: border-box;
+  margin: 0 auto 0 0; /* Set margin-left to 0 for left alignment */
+}
+
+.header-logout-btn {
+  background: #d32f2f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 0; /* Ensure left alignment */
+}
+
+.header-logout-btn:hover {
+  background: #a62828;
+}

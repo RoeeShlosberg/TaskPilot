@@ -1,0 +1,37 @@
+.register-page,
+.register-page-main {
+  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.register-page {
+  background: #f0f4fa;
+}
+
+.register-page-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 32px;
+}
+
+.register-page-link-container {
+  margin-top: 0rem;
+  text-align: center;
+  font-size: large;
+}
+
+.register-page-link {
+  color: #1976D2;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.register-page-link:hover {
+  color: #125ea2;
+}

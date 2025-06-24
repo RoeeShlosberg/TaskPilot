@@ -1,0 +1,20 @@
+.logo-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: flex-start; /* Changed from center to left-align */
+}
+
+.logo-title-logo {
+  width: 64px;
+  height: 60px;
+}
+
+.logo-title-text {
+  font-size: 6rem;
+  font-weight: 800;
+  color: #1976D2;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px #0001;
+  text-align: left; /* Changed from center to left-align */
+}

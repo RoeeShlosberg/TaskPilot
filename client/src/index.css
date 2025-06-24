@@ -1,0 +1,27 @@
+/* Minimal CSS reset */
+body, html, #root {
+  height: 90dvh;
+  min-height: 90dvh;
+  width: 90vw;
+  min-width: 90vw;
+  max-width: 90vw;
+  margin: 0;
+  padding: 0;
+  background: #f0f4fa !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #f0f4fa !important;
+}
+
+/* For smaller screens, ensure content doesn't overflow */
+@media (max-width: 1600px) {
+  .header, .main-page-content, .main-page-header, .task-list, .task, .sort-controls {
+    max-width: 95vw;
+  }
+}

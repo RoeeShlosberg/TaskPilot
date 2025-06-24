@@ -47,7 +47,6 @@ services:
         value: TaskPilot
       - key: DEBUG
         value: false
-    
     # Health check
     healthCheckPath: /health
     
@@ -60,6 +59,35 @@ services:
       name: taskpilot-data
       mountPath: /app/data
       sizeGB: 1
+
+  # TaskPilot React Client
+  - type: web
+    name: taskpilot-client
+    runtime: docker
+    repo: https://github.com/your-username/TaskPilot.git # Replace with your actual repo
+    branch: main
+    dockerfilePath: ./docker/client.DockerFile
+    dockerContext: .
+    
+    # Environment variables
+    envVars:
+      - key: NODE_ENV
+        value: production
+    
+    # Health check
+    healthCheckPath: /
+    
+    # Scaling and resources
+    numInstances: 1
+    plan: starter # or 'standard' for production
+    
+    # CORS configuration to connect to API
+    envVars:
+      - key: API_URL
+        fromService:
+          type: web
+          name: taskpilot-api
+          envVarKey: RENDER_EXTERNAL_URL
 
   # Redis Cache Service
   - type: redis

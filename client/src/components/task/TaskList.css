@@ -1,0 +1,8 @@
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 1600px; /* Further increased max-width */
+  margin-left: 0; /* Ensure left alignment */
+}
