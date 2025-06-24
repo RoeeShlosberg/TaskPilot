@@ -193,8 +193,13 @@ export default function MainPage() {
               onTagFilterChange={handleTagFilterChange}
             />
           )}
-        </div>
-        <div className="main-page-actions">
+        </div>        <div className="main-page-actions">
+          <button className="add-task-btn" onClick={() => setShowAddForm(true)}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 3a1 1 0 00-1 1v5H4a1 1 0 100 2h5v5a1 1 0 102 0v-5h5a1 1 0 100-2h-5V4a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            Add Task
+          </button>
           <button className="agent-btn" onClick={handleSummaryClick}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
@@ -207,12 +212,6 @@ export default function MainPage() {
               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
             </svg>
             Recommend
-          </button>
-          <button className="add-task-btn" onClick={() => setShowAddForm(true)}>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 3a1 1 0 00-1 1v5H4a1 1 0 100 2h5v5a1 1 0 102 0v-5h5a1 1 0 100-2h-5V4a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-            Add Task
           </button>
         </div>
       </div>

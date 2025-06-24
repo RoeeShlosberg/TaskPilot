@@ -10,8 +10,7 @@ export default function Header() {
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     navigate('/');
-  };
-  return (
+  };  return (
     <header className="header">
       <button className="header-logout-btn" onClick={handleLogout}>
         Log out

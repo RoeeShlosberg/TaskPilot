@@ -15,8 +15,8 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  width: 80%;
-  max-width: 900px;
+  width: 90%;
+  max-width: 1200px; /* Increased from 900px for a wider dialog */
   max-height: 80vh;
   display: flex;
   flex-direction: column;

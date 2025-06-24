@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  justify-content: center;
+  justify-content: flex-start; /* Changed from center to left-align */
 }
 
 .logo-title-logo {
@@ -16,5 +16,5 @@
   color: #1976D2;
   letter-spacing: 1px;
   text-shadow: 0 2px 8px #0001;
-  text-align: center;
+  text-align: left; /* Changed from center to left-align */
 }

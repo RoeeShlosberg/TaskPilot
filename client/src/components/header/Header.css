@@ -1,13 +1,15 @@
 .header {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 1rem;
+  padding-left: 0; /* Remove left padding */
   background: none;
   position: relative;
   width: 100%;
-  max-width: 100%;
+  max-width: 1600px; /* Further increased max-width */
   box-sizing: border-box;
+  margin: 0 auto 0 0; /* Set margin-left to 0 for left alignment */
 }
 
 .header-logout-btn {
@@ -19,7 +21,7 @@
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  justify-self: start;
+  margin-left: 0; /* Ensure left alignment */
 }
 
 .header-logout-btn:hover {

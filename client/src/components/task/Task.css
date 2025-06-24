@@ -9,15 +9,15 @@
   flex-direction: column;
   width: 100%;
   height: auto;
-  max-width: 1200px;
+  max-width: 1600px; /* Further increased max-width */
   min-height: 40px;
 }
 
 .task-header {
   display: grid;
-  grid-template-columns: 30px minmax(100px, 1.5fr) 100px 100px 40px 30px;
+  grid-template-columns: 30px minmax(200px, 3fr) 100px 100px 40px 30px; /* Increased title column width */
   align-items: center;
-  gap: 46px;
+  gap: 35px; /* Slightly reduced gap */
   padding: 0 5px;
 }
 
@@ -472,7 +472,7 @@
 
 @media (max-width: 768px) {
   .task-header {
-    grid-template-columns: 30px minmax(80px, 1fr) 90px 80px 35px 30px;
+    grid-template-columns: 30px minmax(120px, 1.5fr) 90px 80px 35px 30px; /* Increased title column width */
     gap: 5px;
   }
 }
