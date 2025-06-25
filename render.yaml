@@ -25,17 +25,11 @@ services:
       - key: AI_API_KEY
         value: ""  # You'll need to set this manually in Render dashboard
       - key: REDIS_HOST
-        fromService:
-          type: redis
-          name: taskpilot-redis
-          property: host
+        value: ""  # Redis disabled for free tier
       - key: REDIS_PORT
-        fromService:
-          type: redis
-          name: taskpilot-redis
-          property: port
+        value: ""  # Redis disabled for free tier
       - key: REDIS_PASSWORD
-        value: ""  # Redis on Render starter plan usually doesn't need password
+        value: ""  # Redis disabled for free tier
       - key: REDIS_DB
         value: 0
       - key: APP_NAME
@@ -48,13 +42,10 @@ services:
     
     # Scaling and resources
     numInstances: 1
-    plan: starter
+    plan: free
     
-    # Persistent disk for SQLite database
-    disk:
-      name: taskpilot-data
-      mountPath: /app/data
-      sizeGB: 1
+    # Note: Free plan doesn't support persistent disks
+    # SQLite database will be in-memory only
 
   # TaskPilot React Client
   - type: web
@@ -80,17 +71,17 @@ services:
     
     # Scaling and resources
     numInstances: 1
-    plan: starter
+    plan: free
 
-  # Redis Cache Service
-  - type: redis
-    name: taskpilot-redis
-    ipAllowList: []
-    plan: starter
-    maxmemoryPolicy: allkeys-lru
+  # Redis Cache Service (commented out - requires payment)
+  # - type: redis
+  #   name: taskpilot-redis
+  #   ipAllowList: []
+  #   plan: starter
+  #   maxmemoryPolicy: allkeys-lru
 
-# Databases (for storing secrets if needed)
-databases:
-  - name: taskpilot-secrets
-    plan: starter
-    databaseName: taskpilot_secrets
+# Databases (commented out - requires payment)
+# databases:
+#   - name: taskpilot-secrets
+#     plan: starter
+#     databaseName: taskpilot_secrets
