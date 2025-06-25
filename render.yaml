@@ -3,7 +3,7 @@ services:
   - type: web
     name: taskpilot-api
     runtime: docker
-    repo: https://github.com/sroee/TaskPilot.git # Updated with actual repo
+    repo: https://github.com/RoeeShlosberg/TaskPilot # Updated with actual repo
     branch: main
     dockerfilePath: ./docker/Dockerfile
     dockerContext: .
@@ -64,7 +64,7 @@ services:
   - type: web
     name: taskpilot-client
     runtime: docker
-    repo: https://github.com/sroee/TaskPilot.git # Updated with actual repo
+    repo: https://github.com/RoeeShlosberg/TaskPilot # Updated with actual repo
     branch: main
     dockerfilePath: ./docker/client.DockerFile
     dockerContext: .
