@@ -73,6 +73,11 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: API_URL
+        fromService:
+          type: web
+          name: taskpilot-api
+          envVarKey: RENDER_EXTERNAL_URL
     
     # Health check
     healthCheckPath: /
@@ -80,14 +85,6 @@ services:
     # Scaling and resources
     numInstances: 1
     plan: starter # or 'standard' for production
-    
-    # CORS configuration to connect to API
-    envVars:
-      - key: API_URL
-        fromService:
-          type: web
-          name: taskpilot-api
-          envVarKey: RENDER_EXTERNAL_URL
 
   # Redis Cache Service
   - type: redis
