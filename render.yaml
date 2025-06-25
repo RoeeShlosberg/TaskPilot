@@ -3,7 +3,7 @@ services:
   - type: web
     name: taskpilot-api
     runtime: docker
-    repo: https://github.com/RoeeShlosberg/TaskPilot # Updated with actual repo
+    repo: https://github.com/RoeeShlosberg/TaskPilot
     branch: main
     dockerfilePath: ./docker/Dockerfile
     dockerContext: .
@@ -47,12 +47,13 @@ services:
         value: TaskPilot
       - key: DEBUG
         value: false
+        
     # Health check
     healthCheckPath: /health
     
     # Scaling and resources
     numInstances: 1
-    plan: starter # or 'standard' for production
+    plan: starter
     
     # Persistent disk for SQLite database
     disk:
@@ -64,7 +65,7 @@ services:
   - type: web
     name: taskpilot-client
     runtime: docker
-    repo: https://github.com/RoeeShlosberg/TaskPilot # Updated with actual repo
+    repo: https://github.com/RoeeShlosberg/TaskPilot
     branch: main
     dockerfilePath: ./docker/client.DockerFile
     dockerContext: .
@@ -84,13 +85,13 @@ services:
     
     # Scaling and resources
     numInstances: 1
-    plan: starter # or 'standard' for production
+    plan: starter
 
   # Redis Cache Service
   - type: redis
     name: taskpilot-redis
-    ipAllowList: [] # Empty allows all IPs from your services
-    plan: starter # or 'standard' for production
+    ipAllowList: []
+    plan: starter
     maxmemoryPolicy: allkeys-lru
 
 # Databases (for storing secrets)
@@ -98,13 +99,3 @@ databases:
   - name: taskpilot-secrets
     plan: starter
     databaseName: taskpilot_secrets
-    
-# Build and deployment settings
-buildCommand: |
-  echo "Building TaskPilot..."
-  # Dependencies are installed via Dockerfile
-  echo "Build completed successfully"
-
-startCommand: |
-  echo "Starting TaskPilot API server..."
-  cd /app && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
