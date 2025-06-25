@@ -27,7 +27,7 @@ services:
       - key: REDIS_HOST
         value: ""  # Redis disabled for free tier
       - key: REDIS_PORT
-        value: ""  # Redis disabled for free tier
+        value: 0  # Redis disabled for free tier
       - key: REDIS_PASSWORD
         value: ""  # Redis disabled for free tier
       - key: REDIS_DB
