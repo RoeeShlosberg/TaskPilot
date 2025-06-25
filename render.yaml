@@ -89,13 +89,8 @@ services:
     plan: starter
     maxmemoryPolicy: allkeys-lru
 
-# Databases (for storing secrets)
+# Databases (for storing secrets if needed)
 databases:
   - name: taskpilot-secrets
     plan: starter
     databaseName: taskpilot_secrets
-  echo "Build completed successfully"
-
-startCommand: |
-  echo "Starting TaskPilot API server..."
-  cd /app && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
