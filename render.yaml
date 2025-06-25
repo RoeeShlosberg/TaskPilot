@@ -23,9 +23,7 @@ services:
       - key: AI_PROVIDER
         value: openrouter
       - key: AI_API_KEY
-        fromDatabase:
-          name: taskpilot-secrets
-          property: ai_api_key
+        value: ""  # You'll need to set this manually in Render dashboard
       - key: REDIS_HOST
         fromService:
           type: redis
@@ -37,10 +35,7 @@ services:
           name: taskpilot-redis
           property: port
       - key: REDIS_PASSWORD
-        fromService:
-          type: redis
-          name: taskpilot-redis
-          property: password
+        value: ""  # Redis on Render starter plan usually doesn't need password
       - key: REDIS_DB
         value: 0
       - key: APP_NAME
@@ -99,3 +94,8 @@ databases:
   - name: taskpilot-secrets
     plan: starter
     databaseName: taskpilot_secrets
+  echo "Build completed successfully"
+
+startCommand: |
+  echo "Starting TaskPilot API server..."
+  cd /app && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
