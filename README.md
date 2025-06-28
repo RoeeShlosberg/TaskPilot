@@ -75,13 +75,13 @@ The application will be available at:
 - **Backend API:** http://localhost:8000
 - **API docs:** http://localhost:8000/docs
 
-### Screenshots
+##
 
 **Login Page:**
 ![TaskPilot Login](public/login.png)
 
-**Main Dashboard:**
-![TaskPilot Dashboard](public/main.png)
+**AI Recommendations:**
+![TaskPilot Login](public/taskRecommendations.png)
 
 ## Features Overview
 

@@ -25,7 +25,6 @@ export default function LoginForm() {
       });
       // Save token to localStorage
       localStorage.setItem('access_token', response.data.access_token);
-      alert(`Logged in as ${username}`);
       navigate('/main');
     } catch (err: any) {
       if (err.response && err.response.data && err.response.data.detail) {
